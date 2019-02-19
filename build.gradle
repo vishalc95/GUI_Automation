@@ -1,1 +1,93 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
+    }
+}
 
+plugins {
+    id 'com.gradle.build-scan' version '1.11'
+    id "net.saliman.properties" version "1.4.6"
+    id 'org.asciidoctor.convert' version '1.5.6' apply false
+    id 'org.hidetake.ssh' version '1.1.3'
+    id 'java'
+    id 'groovy'
+    id 'base'
+    id 'eclipse'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    testCompile(
+            project(':buildSrc'),
+            'org.codehaus.groovy:groovy-all:2.4.10',
+            'org.spockframework:spock-core:1.0-groovy-2.4',
+            'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1',
+            'org.slf4j:slf4j-simple:1.7.12',
+            'org.slf4j:slf4j-api:1.6.0',
+            'org.testng:testng:6.8.13',
+            'org.seleniumhq.selenium:selenium-firefox-driver:2.51.0',
+            'org.seleniumhq.selenium:selenium-support:2.51.0',
+            "org.gebish:geb-spock:0.13.1",
+            "org.gebish:geb-junit4:0.13.1",
+            "org.hidetake:groovy-ssh:2.9.0",
+            'commons-codec:commons-codec:1.6',
+            "junit:junit:4.12",
+            "org.awaitility:awaitility:3.0.0",
+            "com.oracle:ojdbc6:11.2.0.3"
+    )
+
+    compile "com.googlecode.json-simple:json-simple:1.1.1"
+    compile "org.apache.httpcomponents:httpclient:4.5.3"
+    compile 'org.codehaus.groovy:groovy-all:2.4.10'
+    compile project(':buildSrc')
+}
+
+configurations {
+    testCompile.exclude group: "org.slf4j", module: "slf4j-simple"
+}
+
+allprojects {
+    apply plugin: 'net.saliman.properties'
+
+    repositories { jcenter() }
+
+    ext {
+        resourceDir = "./resource"
+        templateDir = "./templates"
+        binPrefix = "ksm-bin-"
+        psmScrtipLoc = project.projectDir.toString() + "/kms-env/bin/psm-provisioning"
+        zipName = "kms-bin-${VERSION}"
+        sshUser = 'abhibane'
+        artifactoryUrl = "${KMS_REPO}/kms-bin/${VERSION}/${zipName}.zip"
+
+        psmInstanceUrl = PSM_URL + PSM_INSTANCE_URI
+        psmInstanceUriTag= PSM_INSTANCE_URI_TAG
+        kmsPodID = PODID
+        FIREFOX_LOC = "${projectDir}/firefox-45.0/firefox-bin"
+        nimbulaKey = "${projectDir}/ssh/id_rsa"
+        isManaged = project.hasProperty('MANAGED_POD') ? MANAGED_POD : 'true'
+        vmUser = 'kmsvmadmin'
+        vmPass = 'Welcome1@'
+        suiteName=""
+    }
+    buildScan {
+        licenseAgreementUrl = 'https://gradle.com/terms-of-service'
+        licenseAgree = 'yes'
+    }
+}
+
+group 'kms.lcmqa'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'project-report'
+apply plugin: 'kms.lcmqa.pipeline'
+
+sourceCompatibility = 1.8
