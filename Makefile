@@ -14,20 +14,20 @@ TEST_OBJ_FILES = $(patsubst $(TEST_DIR)/%.cpp, $(TEST_DIR)/%.o, $(TEST_FILES))
 TARGET = myapp
 TEST_TARGET = myapp_test
 
-.PHONY: all clean test
+.PHONY: all clean test install
 
-all: $(TARGET)
+all: $(TARGET) $(TEST_TARGET)
 
 $(TARGET): $(OBJ_FILES)
     $(CXX) $(CXXFLAGS) -o $@ $^
 
-$(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
-    $(CXX) $(CXXFLAGS) -c -o $@ $<
-
 $(TEST_TARGET): $(TEST_OBJ_FILES) $(OBJ_FILES)
     $(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
+$(SRC_DIR)/%.o: %.cpp
+    $(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(TEST_DIR)/%.o: %.cpp
     $(CXX) $(CXXFLAGS) -c -o $@ $<
 
 test: $(TEST_TARGET)
@@ -35,3 +35,9 @@ test: $(TEST_TARGET)
 
 clean:
     rm -f $(SRC_DIR)/*.o $(TEST_DIR)/*.o $(TARGET) $(TEST_TARGET)
+
+install: $(TARGET) $(TEST_TARGET)
+    install -D -m 0755 $(TARGET) /usr/local/bin/$(TARGET)
+    install -D -m 0755 $(TEST_TARGET) /usr/local/bin/$(TEST_TARGET)
+
+.DELETE_ON_ERROR:
