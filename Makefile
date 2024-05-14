@@ -17,23 +17,21 @@ TEST_TARGET = myapp_test
 .PHONY: all clean test
 
 all: $(TARGET)
-$(TARGET): $(OBJ_FILES)
 
 $(TARGET): $(OBJ_FILES)
-$(CXX) $(CXXFLAGS) -o $@ $^
+    $(CXX) $(CXXFLAGS) -o $@ $^
 
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
-$(CXX) $(CXXFLAGS) -c -o $@ $<
+    $(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(TEST_TARGET): $(TEST_OBJ_FILES) $(filter-out $(SRC_DIR)/main.o, $(OBJ_FILES))
-$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+$(TEST_TARGET): $(TEST_OBJ_FILES) $(OBJ_FILES)
+    $(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
-$(CXX) $(CXXFLAGS) -c -o $@ $<
+    $(CXX) $(CXXFLAGS) -c -o $@ $<
 
 test: $(TEST_TARGET)
-./$(TEST_TARGET)
+    ./$(TEST_TARGET)
 
 clean:
     rm -f $(SRC_DIR)/*.o $(TEST_DIR)/*.o $(TARGET) $(TEST_TARGET)
-
